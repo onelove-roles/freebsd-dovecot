@@ -1,0 +1,39 @@
+doveadm_port = 12345
+doveadm_password = secret
+
+plugin {
+  mail_replica = tcps:mail.{{ mail_domain }}
+}
+
+service doveadm {
+  inet_listener {
+    port = 12345
+    ssl = yes
+  }
+}
+
+service replicator {
+  process_min_avail = 1
+}
+
+service replicator {
+  unix_listener replicator-doveadm {
+    mode = 0600
+  }
+}
+
+service aggregator {
+  fifo_listener replication-notify-fifo {
+    user = nobody
+  }
+  unix_listener replication-notify {
+    user = nobody
+  }
+}
+
+service replicator {
+  unix_listener replicator-doveadm {
+    mode = 0600
+    user = nobody
+  }
+}
